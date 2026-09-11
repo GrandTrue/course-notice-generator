@@ -84,6 +84,7 @@
     editors: document.querySelector("#notice-editors"),
     noticeCount: document.querySelector("#notice-count"),
     limitMessage: document.querySelector("#limit-message"),
+    reorderStatus: document.querySelector("#reorder-status"),
     undoBar: document.querySelector("#undo-bar"),
     undoText: document.querySelector("#undo-text"),
     undoButton: document.querySelector("#undo-delete"),
@@ -107,6 +108,7 @@
   let undoState = null;      // { notice, index, label }
   let undoTimer;
   let ioTimer;
+  let dragState = null;      // { article, handle, pointerId, sheetId, noticeId, moved }
 
   function createId(prefix) {
     return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -802,6 +804,9 @@
 
     elements.exportImage.addEventListener("click", exportCurrentSheetAsImage);
     elements.printNotice.addEventListener("click", () => window.print());
+    document.addEventListener("pointermove", moveDraggedNotice, { passive: false });
+    document.addEventListener("pointerup", finishNoticeDrag);
+    document.addEventListener("pointercancel", finishNoticeDrag);
     window.addEventListener("resize", updatePreviewScale);
     window.addEventListener("beforeprint", () => document.documentElement.style.setProperty("--preview-scale", "1"));
     window.addEventListener("afterprint", updatePreviewScale);
@@ -811,6 +816,114 @@
    * 渲染
    * ======================================================================== */
 
+  function updateEditorPositionLabels() {
+    const cards = [...elements.editors.children];
+    cards.forEach((article, index) => {
+      article.querySelector("h3").textContent = `第 ${index + 1} 則公告`;
+      const handle = article.querySelector(".drag-notice");
+      handle.setAttribute("aria-label", `拖曳第 ${index + 1} 則公告調整順序；按向上或向下方向鍵也可移動`);
+      article.querySelector(".delete-notice").setAttribute("aria-label", `刪除第 ${index + 1} 則公告`);
+    });
+  }
+
+  function focusNoticeDragHandle(noticeId) {
+    const article = [...elements.editors.children].find((item) => item.dataset.id === noticeId);
+    article?.querySelector(".drag-notice")?.focus({ preventScroll: true });
+  }
+
+  function announceNoticePosition(noticeId) {
+    const index = activeSheet().notices.findIndex((notice) => notice.id === noticeId);
+    elements.reorderStatus.textContent = `已移至第 ${index + 1} 則，共 ${activeSheet().notices.length} 則。`;
+  }
+
+  function reorderNoticeWithKeyboard(noticeId, offset) {
+    const sheet = activeSheet();
+    const from = sheet.notices.findIndex((notice) => notice.id === noticeId);
+    const to = Math.max(0, Math.min(from + offset, sheet.notices.length - 1));
+    if (from < 0 || from === to) return;
+    const [notice] = sheet.notices.splice(from, 1);
+    sheet.notices.splice(to, 0, notice);
+    renderEditors();
+    renderPreview();
+    persistState();
+    announceNoticePosition(noticeId);
+    requestAnimationFrame(() => focusNoticeDragHandle(noticeId));
+  }
+
+  function autoScrollWhileDragging(clientY) {
+    const stacked = window.matchMedia("(max-width: 1050px)").matches;
+    const bounds = stacked
+      ? { top: 0, bottom: window.innerHeight }
+      : elements.editorBody.getBoundingClientRect();
+    const edge = 64;
+    let delta = 0;
+    if (clientY < bounds.top + edge) delta = -18;
+    else if (clientY > bounds.bottom - edge) delta = 18;
+    if (!delta) return;
+    if (stacked) window.scrollBy(0, delta);
+    else elements.editorBody.scrollTop += delta;
+  }
+
+  function moveDraggedNotice(event) {
+    if (!dragState || event.pointerId !== dragState.pointerId) return;
+    event.preventDefault();
+    autoScrollWhileDragging(event.clientY);
+    const { article } = dragState;
+    const otherCards = [...elements.editors.children].filter((item) => item !== article);
+    const nextCard = otherCards.find((item) => {
+      const bounds = item.getBoundingClientRect();
+      return event.clientY < bounds.top + bounds.height / 2;
+    });
+    if (nextCard) {
+      if (article.nextElementSibling === nextCard) return;
+      elements.editors.insertBefore(article, nextCard);
+    } else {
+      if (article === elements.editors.lastElementChild) return;
+      elements.editors.append(article);
+    }
+    dragState.moved = true;
+    updateEditorPositionLabels();
+  }
+
+  function finishNoticeDrag(event) {
+    if (!dragState || event.pointerId !== dragState.pointerId) return;
+    const { article, handle, sheetId, noticeId, moved } = dragState;
+    if (handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
+    article.classList.remove("is-dragging");
+    elements.editors.classList.remove("is-reordering");
+    document.body.classList.remove("notice-drag-active");
+    dragState = null;
+    if (!moved || activeSheet().id !== sheetId) return;
+
+    const noticesById = new Map(activeSheet().notices.map((notice) => [notice.id, notice]));
+    activeSheet().notices = [...elements.editors.children]
+      .map((item) => noticesById.get(item.dataset.id))
+      .filter(Boolean);
+    renderEditors();
+    renderPreview();
+    persistState();
+    announceNoticePosition(noticeId);
+    requestAnimationFrame(() => focusNoticeDragHandle(noticeId));
+  }
+
+  function beginNoticeDrag(event, article, noticeId) {
+    if ((event.pointerType === "mouse" && event.button !== 0) || activeSheet().notices.length <= 1) return;
+    event.preventDefault();
+    const handle = event.currentTarget;
+    dragState = {
+      article,
+      handle,
+      pointerId: event.pointerId,
+      sheetId: activeSheet().id,
+      noticeId,
+      moved: false
+    };
+    handle.setPointerCapture(event.pointerId);
+    article.classList.add("is-dragging");
+    elements.editors.classList.add("is-reordering");
+    document.body.classList.add("notice-drag-active");
+  }
+
   function renderEditors() {
     const sheet = activeSheet();
     elements.editors.replaceChildren();
@@ -819,6 +932,16 @@
       const article = fragment.querySelector(".notice-editor");
       article.dataset.id = notice.id;
       fragment.querySelector("h3").textContent = `第 ${index + 1} 則公告`;
+
+      const dragHandle = fragment.querySelector(".drag-notice");
+      dragHandle.disabled = sheet.notices.length === 1;
+      dragHandle.setAttribute("aria-label", `拖曳第 ${index + 1} 則公告調整順序；按向上或向下方向鍵也可移動`);
+      dragHandle.addEventListener("pointerdown", (event) => beginNoticeDrag(event, article, notice.id));
+      dragHandle.addEventListener("keydown", (event) => {
+        if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+        event.preventDefault();
+        reorderNoticeWithKeyboard(notice.id, event.key === "ArrowUp" ? -1 : 1);
+      });
 
       fragment.querySelectorAll("[data-field]").forEach((control) => {
         const field = control.dataset.field;

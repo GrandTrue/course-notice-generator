@@ -7,7 +7,7 @@
   <meta name="description" content="可直接在瀏覽器製作、列印與下載 A4 課程異動公告的免費工具。">
   <link rel="icon" href="data:,">
   <title>A4 課程異動公告工具</title>
-  <link rel="stylesheet" href="style.css?v=20260911-image-export-1">
+  <link rel="stylesheet" href="style.css?v=20260911-drag-reorder-1">
 </head>
 <body>
   <div class="app-shell">
@@ -234,7 +234,17 @@
   <template id="notice-editor-template">
     <article class="notice-editor">
       <div class="notice-editor-heading">
-        <h3></h3>
+        <div class="notice-editor-title">
+          <button class="drag-notice" type="button" aria-describedby="reorder-instructions">
+            <svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16">
+              <circle cx="5" cy="3" r="1.2"/><circle cx="11" cy="3" r="1.2"/>
+              <circle cx="5" cy="8" r="1.2"/><circle cx="11" cy="8" r="1.2"/>
+              <circle cx="5" cy="13" r="1.2"/><circle cx="11" cy="13" r="1.2"/>
+            </svg>
+            <span>拖曳</span>
+          </button>
+          <h3></h3>
+        </div>
         <button class="delete-notice" type="button">刪除</button>
       </div>
       <div class="notice-form-grid">
@@ -282,6 +292,9 @@
     </article>
   </template>
 
+  <p id="reorder-instructions" class="visually-hidden">按住拖曳可調整順序；使用鍵盤時，按向上或向下方向鍵移動這則公告。</p>
+  <p id="reorder-status" class="visually-hidden" role="status" aria-live="polite"></p>
+
   <template id="preview-notice-template">
     <section class="sheet-notice">
       <div class="notice-topline">
@@ -310,6 +323,6 @@
     </section>
   </template>
 
-  <script src="script.js?v=20260911-image-export-1"></script>
+  <script src="script.js?v=20260911-drag-reorder-1"></script>
 </body>
 </html>
