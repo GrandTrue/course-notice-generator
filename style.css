@@ -36,7 +36,7 @@
   --paper-height: 793.7px;
   --print-width: 297mm;
   --print-height: 210mm;
-  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  font-family: "Course Notice Sans", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   color: var(--ui-text);
   background: var(--ui-bg);
 }
@@ -511,7 +511,7 @@ body.notice-drag-active { cursor: grabbing; user-select: none; }
   background: var(--paper-surface);
   color: var(--paper-ink);
   box-shadow: var(--sheet-shadow);
-  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  font-family: "Course Notice Sans", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
 }
 .notice-sheet.orientation-portrait {
   --paper-width: 793.7px;
@@ -1178,8 +1178,8 @@ body[data-theme="official"] {
   --sheet-accent-width: 112px;
   --sheet-accent-height: 7px;
   --sheet-accent-bg: #982b35;
-  --display-font: "Noto Serif TC", "PMingLiU", "Microsoft JhengHei", serif;
-  --classroom-font: Georgia, "Noto Serif TC", "PMingLiU", serif;
+  --display-font: "Course Notice Serif", "Noto Serif TC", "PMingLiU", "Microsoft JhengHei", serif;
+  --classroom-font: "Course Notice Serif", Georgia, "Noto Serif TC", "PMingLiU", serif;
   --title-tracking: .12em;
   --classroom-color: #173f67;
   --sheet-title-color: #982b35;
@@ -1240,7 +1240,7 @@ body[data-theme="newsprint"] {
   --editor-badge: "CAMPUS BULLETIN";
   --editor-badge-top: 15px;
   --editor-badge-color: #111;
-  --editor-badge-font: Georgia, "Times New Roman", serif;
+  --editor-badge-font: "Course Notice Serif", Georgia, "Times New Roman", serif;
   --editor-badge-tracking: .12em;
   --field-radius: 0;
   --swatch-radius: 0;
@@ -1250,7 +1250,7 @@ body[data-theme="newsprint"] {
   --sheet-shadow: 8px 8px 0 rgb(0 0 0 / 18%);
   --sheet-header-rule: 7px double #111;
   --sheet-accent-display: none;
-  --display-font: Georgia, "Noto Serif TC", "PMingLiU", serif;
+  --display-font: "Course Notice Serif", Georgia, "Noto Serif TC", "PMingLiU", serif;
   --classroom-tracking: -.035em;
   --title-tracking: .04em;
   --sheet-subtitle-color: #111;
@@ -1286,7 +1286,7 @@ body[data-theme="newsprint"] .sheet-notice::before {
   transform: translateY(-50%);
   border-top: 2px solid #111;
   border-bottom: 2px solid #111;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: "Course Notice Serif", Georgia, "Times New Roman", serif;
   font-size: 19px;
   font-weight: 900;
   line-height: 1.55;

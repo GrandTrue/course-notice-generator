@@ -1,3 +1,5 @@
 # 本機匯出的備份與測試產物不應發布或提交
 Expo/
 qa-*.png
+.font-build-tools/
+.font-sources/

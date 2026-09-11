@@ -14,6 +14,20 @@
   const IO_MESSAGE_TIMEOUT = 8000;
   const IMAGE_EXPORT_SCALE = 2;       // 約 192 dpi，兼顧印刷清晰度與檔案大小
   const EXPORT_FORMAT = "course-notice-tool";   // 匯出檔的識別字串
+  const FONT_ASSETS = {
+    sans: {
+      family: "Course Notice Sans",
+      file: "fonts/NotoSansTC-Variable.woff2",
+      fallbackScript: "fonts/sans.data.js",
+      weight: "100 900"
+    },
+    serif: {
+      family: "Course Notice Serif",
+      file: "fonts/NotoSerifTC-Variable.woff2",
+      fallbackScript: "fonts/serif.data.js",
+      weight: "200 900"
+    }
+  };
 
   const STATUS_LABELS = {
     cancelled: "停課",
@@ -109,6 +123,8 @@
   let undoTimer;
   let ioTimer;
   let dragState = null;      // { article, handle, pointerId, sheetId, noticeId, moved }
+  const fontDataPromises = new Map();
+  const runtimeFontPromises = new Map();
 
   function createId(prefix) {
     return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -521,6 +537,111 @@
     return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
   }
 
+  function blobToDataUrl(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(new Error("無法讀取嵌入字體。"));
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function loadFontFallbackScript(asset, key) {
+    return new Promise((resolve, reject) => {
+      if (window.COURSE_NOTICE_FONT_DATA?.[key]) {
+        resolve(window.COURSE_NOTICE_FONT_DATA[key]);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = asset.fallbackScript;
+      script.onload = () => {
+        script.remove();
+        const encoded = window.COURSE_NOTICE_FONT_DATA?.[key];
+        if (encoded) resolve(encoded);
+        else reject(new Error("離線字體資料不完整，請確認 fonts 資料夾仍與 index.html 放在一起。"));
+      };
+      script.onerror = () => {
+        script.remove();
+        reject(new Error("找不到離線字體資料，請確認 fonts 資料夾仍與 index.html 放在一起。"));
+      };
+      document.head.append(script);
+    });
+  }
+
+  function fontDataUrl(key) {
+    if (fontDataPromises.has(key)) return fontDataPromises.get(key);
+    const asset = FONT_ASSETS[key];
+    const promise = (async () => {
+      if (window.location.protocol === "file:") {
+        const encoded = await loadFontFallbackScript(asset, key);
+        return `data:font/woff2;base64,${encoded}`;
+      }
+      try {
+        const response = await fetch(asset.file);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return await blobToDataUrl(await response.blob());
+      } catch (error) {
+        // file:// 禁止 fetch 同資料夾檔案；改載入延遲 Base64 備援，維持離線 PNG 一致。
+        const encoded = await loadFontFallbackScript(asset, key);
+        return `data:font/woff2;base64,${encoded}`;
+      }
+    })();
+    fontDataPromises.set(key, promise);
+    return promise;
+  }
+
+  function loadRuntimeFont(key) {
+    if (runtimeFontPromises.has(key)) return runtimeFontPromises.get(key);
+    const asset = FONT_ASSETS[key];
+    const promise = (async () => {
+      const source = window.location.protocol === "file:"
+        ? `url("${await fontDataUrl(key)}") format("woff2")`
+        : `url("${asset.file}") format("woff2")`;
+      const face = new FontFace(asset.family, source, {
+        style: "normal",
+        weight: asset.weight,
+        display: "swap"
+      });
+      await face.load();
+      document.fonts.add(face);
+      return face;
+    })();
+    runtimeFontPromises.set(key, promise);
+    return promise;
+  }
+
+  async function loadRuntimeFontsForCurrentTheme() {
+    const keys = ["sans"];
+    if (state.theme === "official" || state.theme === "newsprint") keys.push("serif");
+    await Promise.all(keys.map(loadRuntimeFont));
+  }
+
+  async function embeddedFontCss() {
+    const keys = ["sans"];
+    if (state.theme === "official" || state.theme === "newsprint") keys.push("serif");
+    const rules = await Promise.all(keys.map(async (key) => {
+      const asset = FONT_ASSETS[key];
+      const dataUrl = await fontDataUrl(key);
+      return `@font-face{font-family:"${asset.family}";src:url("${dataUrl}") format("woff2");font-style:normal;font-weight:${asset.weight};}`;
+    }));
+    return rules.join("\n");
+  }
+
+  async function waitForCurrentFonts() {
+    if (!document.fonts) return;
+    await loadRuntimeFontsForCurrentTheme();
+    const loads = [
+      document.fonts.load('400 16px "Course Notice Sans"'),
+      document.fonts.load('900 16px "Course Notice Sans"')
+    ];
+    if (state.theme === "official" || state.theme === "newsprint") {
+      loads.push(document.fonts.load('400 16px "Course Notice Serif"'));
+      loads.push(document.fonts.load('900 16px "Course Notice Serif"'));
+    }
+    await Promise.all(loads);
+    await document.fonts.ready;
+  }
+
   function styleDeclarationText(styles) {
     return [...styles].map((property) => {
       const value = styles.getPropertyValue(property);
@@ -598,15 +719,16 @@
     elements.exportImageLabel.textContent = "產生中…";
 
     try {
-      await document.fonts?.ready;
+      await waitForCurrentFonts();
       fitSheet();
 
       const { clone, pseudoRules } = createStyledExportClone();
+      const fontCss = await embeddedFontCss();
       const exportOverrides = `
         .notice-sheet { position: static !important; top: auto !important; left: auto !important; width: ${width}px !important; height: ${height}px !important; margin: 0 !important; transform: none !important; box-shadow: none !important; }
         .is-placeholder { visibility: hidden !important; }
       `;
-      const css = escapeXmlText(`${pseudoRules}\n${exportOverrides}`);
+      const css = escapeXmlText(`${fontCss}\n${pseudoRules}\n${exportOverrides}`);
       const markup = `
         <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
           <foreignObject width="100%" height="100%">
@@ -740,6 +862,13 @@
         });
         updateAppearanceSummary();
         persistState();
+        loadRuntimeFontsForCurrentTheme().then(() => {
+          fitSheet();
+          updatePreviewScale();
+        }).catch((error) => {
+          console.error(error);
+          showIoMessage("字體載入失敗，目前暫用系統字體。", true);
+        });
       });
     });
 
@@ -803,7 +932,16 @@
     });
 
     elements.exportImage.addEventListener("click", exportCurrentSheetAsImage);
-    elements.printNotice.addEventListener("click", () => window.print());
+    elements.printNotice.addEventListener("click", async () => {
+      try {
+        await waitForCurrentFonts();
+        fitSheet();
+      } catch (error) {
+        console.error(error);
+        showIoMessage("字體載入失敗，將以目前可用字體開啟列印。", true);
+      }
+      window.print();
+    });
     document.addEventListener("pointermove", moveDraggedNotice, { passive: false });
     document.addEventListener("pointerup", finishNoticeDrag);
     document.addEventListener("pointercancel", finishNoticeDrag);
@@ -1166,9 +1304,21 @@
   // 不必等使用者先動一下才存。
   persistState();
 
+  loadRuntimeFontsForCurrentTheme().then(() => {
+    fitSheet();
+    updatePreviewScale();
+  }).catch((error) => {
+    console.error(error);
+    showIoMessage("字體載入失敗，目前暫用系統字體。", true);
+  });
+
   // 字體換掉後字寬會變，重算一次才不會出現「載入完才溢出」。
   if (document.fonts?.ready) {
     document.fonts.ready.then(() => {
+      fitSheet();
+      updatePreviewScale();
+    });
+    document.fonts.addEventListener("loadingdone", () => {
       fitSheet();
       updatePreviewScale();
     });

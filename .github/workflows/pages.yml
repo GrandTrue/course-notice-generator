@@ -26,6 +26,12 @@ jobs:
           test -s index.html
           test -s style.css
           test -s script.js
+          test -s fonts/NotoSansTC-Variable.woff2
+          test -s fonts/NotoSerifTC-Variable.woff2
+          test -s fonts/sans.data.js
+          test -s fonts/serif.data.js
+          test -s fonts/OFL-Noto-Sans-TC.txt
+          test -s fonts/OFL-Noto-Serif-TC.txt
           grep -q 'style.css?v=' index.html
           grep -q 'script.js?v=' index.html
 
@@ -33,6 +39,7 @@ jobs:
         run: |
           mkdir _site
           cp index.html style.css script.js _site/
+          cp -r fonts _site/
           touch _site/.nojekyll
 
       - name: Configure GitHub Pages
