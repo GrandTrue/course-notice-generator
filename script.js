@@ -55,7 +55,7 @@
 
   const ORIENTATIONS = ["landscape", "portrait"];
   const TEMPLATES = ["standard", "large", "compact"];
-  const THEMES = ["classic", "friendly", "geometric", "contemporary", "official", "newsprint"];
+  const THEMES = ["classic", "friendly", "geometric", "contemporary", "official", "newsprint", "frontier"];
   const ORIENTATION_LABELS = { landscape: "橫式", portrait: "直式" };
   const TEMPLATE_LABELS = { standard: "標準排版", large: "醒目大字", compact: "多則緊湊" };
   const THEME_LABELS = { classic: "經典編輯", friendly: "校園手札", geometric: "幾何學院", contemporary: "當代展演", official: "校務公文", newsprint: "黑白報刊" };

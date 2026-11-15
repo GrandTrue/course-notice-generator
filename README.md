@@ -5,7 +5,7 @@
 > 規格說「當初想要什麼」，本文說「現在做成什麼、要改動哪裡」。
 > 兩者衝突時，以本文為準（實作已在幾處刻意超出原規格，見〈與原規格的差異〉）。
 
-最後更新：2026-09-11（第十一次改版）
+最後更新：2026-11-15（第十二次改版）
 
 ---
 
@@ -52,7 +52,7 @@ DOM 不是用字串拼出來的，是 clone `<template>` 再填值。要改結�
 
 ```js
 {
-  theme: "classic" | "friendly" | "geometric" | "contemporary" | "official" | "newsprint",
+  theme: "classic" | "friendly" | "geometric" | "contemporary" | "official" | "newsprint" | "frontier",
   appearanceOpen: true,                     // 「紙張與風格」是否展開（全域 UI 偏好）
   activeSheetId: "sheet-xxx",              // 目前正在編輯哪一張
   sheets: [                                // 1–8 張草稿，每張是一張獨立的 A4 公告
@@ -159,7 +159,9 @@ DOM 不是用字串拼出來的，是 clone `<template>` 再填值。要改結�
 
 ## 6. 主題系統
 
-六個主題：`classic`（預設）、`friendly`、`geometric`、`contemporary`、`official`、`newsprint`。
+七個主題：`classic`（預設）、`friendly`、`geometric`、`contemporary`、`official`、`newsprint`、`frontier`（前線工業）。
+
+前線工業參考[《明日方舟：終末地》官方資訊頁](https://endfield.gryphline.com/zh-tw#information)的黑黃色彩及工業標示。切角報頭與警示線由 CSS 繪製，底部斜紋、細網格及浮水印跟隨草稿的背景開關。
 
 ### 兩層 token
 
@@ -176,7 +178,7 @@ DOM 不是用字串拼出來的，是 clone `<template>` 再填值。要改結�
 3. `style.css` 主題層加一個 `body[data-theme="新名稱"] { ... }`，**只宣告變數**。
 4. `style.css` 加色票小方塊：`.theme-option[data-theme-option="新名稱"] .theme-swatch i:nth-child(1|2|3)`。
 
-只有真的無法用變數表達的造型（額外裝飾線、編號欄、偽元素）才寫成該主題的「結構性補充」，並控制在數行內。目前主題層的元素覆寫選擇器只剩 **30 條**（重構前是 117 條），其中一半集中在 `newsprint` 的流水編號欄。
+只有真的無法用變數表達的造型（額外裝飾線、編號欄、偽元素）才寫成該主題的「結構性補充」，並控制在數行內。
 
 ### 第二層 token 速查
 
@@ -352,12 +354,12 @@ const STATUS_TARGETS = {
 - 編輯器使用原生 `<select>`，鍵盤與螢幕閱讀器可直接操作。
 - 合法值集中在 `COURSE_LEVEL_LABELS`；`sanitizeNotice()` 以這張表做白名單檢查。
 - 分類屬於每一則公告，會跟著草稿儲存、刪除復原及 JSON 匯出／匯入。
-- 分類採直角實心方框字標，文字固定白色；學士班使用 `--level-bachelor-bg`，碩士班使用 `--level-master-bg`。六種主題各自配置一組雙色，黑白報刊以黑／深灰區分。方框高度與課名第一行行高一致，內部文字縮為課名的 58% 並垂直置中。
+- 分類採直角實心方框字標，文字固定白色；學士班使用 `--level-bachelor-bg`，碩士班使用 `--level-master-bg`。各主題配置一組雙色，黑白報刊以黑／深灰區分。方框高度與課名第一行行高一致，內部文字縮為課名的 58% 並垂直置中。
 - 舊 v1／v2 資料一律補成「未分類」，不需要提升 localStorage 主版本。
 
 ### 9.7 背景裝飾（`sheet.backgroundEnabled`）
 
-每張草稿可獨立開關背景裝飾，預設開啟。背景以目前教室名稱作為大型淡浮水印，六種主題各有自己的紋理；這是內容識別，不是隨機裝飾。
+每張草稿可獨立開關背景裝飾，預設開啟。背景以目前教室名稱作為大型淡浮水印，各主題有自己的紋理。
 
 - 1 則使用 9% 不透明度、2 則 6.5%、3／4 則 3.8%、5／6 則 1.8%，公告越密集越不干擾文字。
 - 關閉時，`.background-off .sheet-background-art` 直接 `display: none`，預覽與列印都不輸出裝飾。

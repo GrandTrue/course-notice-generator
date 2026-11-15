@@ -375,6 +375,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--focus); outline:
 .theme-option[data-theme-option="newsprint"] .theme-swatch i:nth-child(1) { background: #111; }
 .theme-option[data-theme-option="newsprint"] .theme-swatch i:nth-child(2) { background: #777; }
 .theme-option[data-theme-option="newsprint"] .theme-swatch i:nth-child(3) { background: #fff; }
+.theme-option[data-theme-option="frontier"] .theme-swatch i:nth-child(1) { background: #212321; }
+.theme-option[data-theme-option="frontier"] .theme-swatch i:nth-child(2) { background: #f5ec42; }
+.theme-option[data-theme-option="frontier"] .theme-swatch i:nth-child(3) { background: #e5e6df; }
 .theme-option > input:checked + span { border-color: var(--accent); background: var(--ui-choice-selected); transform: var(--choice-checked-transform); box-shadow: var(--choice-checked-ring), var(--choice-checked-shadow); }
 .theme-option > input:checked + span strong { color: var(--accent); }
 .theme-option > input:focus-visible + span { outline: 3px solid color-mix(in srgb, var(--focus) 30%, transparent); outline-offset: 2px; }
@@ -1135,6 +1138,85 @@ body[data-theme="contemporary"] .sheet-background-art::before {
   mask-image: none;
 }
 body[data-theme="contemporary"] .sheet-background-art::after { color: #b817aa; text-shadow: 10px 10px #58e0d0; transform: rotate(-4deg); }
+
+/* Frontier — industrial signage on a light, print-friendly sheet. */
+body[data-theme="frontier"] {
+  --signal-yellow: #f5ec42;
+  --signal-carbon: #212321;
+  --ui-bg: #dedfd9;
+  --ui-panel: #f1f2ec;
+  --ui-surface: #fffffa;
+  --ui-text: #212321;
+  --ui-muted: #555951;
+  --ui-border: #c7cac1;
+  --ui-border-strong: #858982;
+  --ui-header: var(--signal-yellow);
+  --ui-card: #fffffa;
+  --ui-choice: #f8f9f3;
+  --ui-choice-selected: #fffac2;
+  --ui-actions: #e8eae2;
+  --accent: #393e35;
+  --accent-dark: #212321;
+  --accent-soft: #f1edbb;
+  --focus: #525a40;
+  --rail: #666b60;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --field-radius: 0;
+  --swatch-radius: 0;
+  --editor-badge: "CLASSROOM / OPERATIONS";
+  --editor-badge-color: #3e411d;
+  --editor-card-rail-alt: #9d921a;
+  --button-secondary-hover: #fffac2;
+  --paper-surface: #fafbf6;
+  --paper-ink: var(--signal-carbon);
+  --paper-rule: #9b9f94;
+  --paper-accent: var(--signal-carbon);
+  --sheet-header-rule: 5px solid var(--signal-yellow);
+  --sheet-accent-display: none;
+  --classroom-color: var(--signal-yellow);
+  --sheet-title-color: #fff;
+  --sheet-subtitle-color: var(--signal-yellow);
+  --classroom-tracking: -.025em;
+  --title-tracking: .035em;
+  --status-radius: 0;
+  --level-bachelor-bg: #565019;
+  --level-master-bg: #3b5763;
+  --footer-rule: 2px solid var(--signal-carbon);
+}
+body[data-theme="frontier"] .notice-sheet .sheet-header {
+  align-items: center;
+  padding: 12px 24px 16px 18px;
+  background: var(--signal-carbon);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+}
+body[data-theme="frontier"] .sheet-notice { padding-inline: 20px 10px; }
+body[data-theme="frontier"] .sheet-notice::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 7px;
+  height: 32px;
+  transform: translateY(-50%);
+  background: linear-gradient(var(--signal-carbon) 0 50%, var(--signal-yellow) 50%);
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 0 100%);
+}
+body[data-theme="frontier"] .status-general { color: var(--signal-carbon); background: var(--signal-yellow); }
+body[data-theme="frontier"] .status-cancelled { color: #fff; background: #9f2024; border-color: #9f2024; }
+body[data-theme="frontier"] .sheet-background-art::before {
+  inset: 4% 0 0;
+  width: auto;
+  height: auto;
+  background-image:
+    linear-gradient(to right, var(--signal-carbon) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--signal-carbon) 1px, transparent 1px),
+    repeating-linear-gradient(135deg, var(--signal-carbon) 0 7px, transparent 7px 14px);
+  background-size: 26px 26px, 26px 26px, 100% 18px;
+  background-position: 0 0, 0 0, right bottom;
+  background-repeat: repeat, repeat, no-repeat;
+}
+body[data-theme="frontier"] .sheet-background-art::after { transform: none; }
 
 /* Official registry — restrained school administration colors and double rules. */
 body[data-theme="official"] {
