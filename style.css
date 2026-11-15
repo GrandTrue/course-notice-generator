@@ -991,10 +991,13 @@ body[data-theme="friendly"] .sheet-background-art::before {
   height: auto;
   background-image:
     radial-gradient(circle at 12% 18%, #d87257 0 42px, transparent 43px),
-    radial-gradient(circle at 88% 76%, #3f675a 0 70px, transparent 71px),
+    radial-gradient(circle at var(--friendly-circle-position, 88% 76%), #3f675a 0 70px, transparent 71px),
     repeating-linear-gradient(to bottom, transparent 0 31px, #3f675a 32px 33px);
   background-size: auto;
   mask-image: linear-gradient(to bottom, transparent 8%, #000 32%, #000 88%, transparent 100%);
+}
+body[data-theme="friendly"] .orientation-landscape .sheet-background-art::before {
+  --friendly-circle-position: 80% 62%;
 }
 body[data-theme="friendly"] .sheet-background-art::after { color: #3f675a; transform: rotate(-5deg); }
 
