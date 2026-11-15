@@ -53,7 +53,7 @@ DOM 不是用字串拼出來的，是 clone `<template>` 再填值。要改結�
 ```js
 {
   theme: "classic" | "friendly" | "geometric" | "contemporary" | "official" | "newsprint" | "frontier",
-  appearanceOpen: true,                     // 「紙張與風格」是否展開（全域 UI 偏好）
+  appearanceOpen: false,                    // 「紙張與風格」是否展開（全域 UI 偏好）
   activeSheetId: "sheet-xxx",              // 目前正在編輯哪一張
   sheets: [                                // 1–8 張草稿，每張是一張獨立的 A4 公告
     {
@@ -368,10 +368,10 @@ const STATUS_TARGETS = {
 
 ### 9.8 紙張與風格收合（`state.appearanceOpen`）
 
-紙張方向、文字排版、視覺風格與背景開關放在原生 `<details>` 中。收合時仍顯示「直式・醒目大字・校務公文・背景關閉」這類即時摘要，使用者不必重新展開確認設定。
+教室下方直接接課程異動項目；頁尾文字和原生 `<details>` 的紙張與風格設定放在課程區下方。收合時仍顯示「A4 直式・校務公文・醒目大字・背景關閉」這類即時摘要。
 
 - 使用原生 `<summary>`，可用滑鼠、Enter 與 Space 操作，不自行模擬 disclosure widget。
-- 收合狀態存在 v2 state，reload 後保留；舊資料沒有此欄位時預設展開。
+- 新使用者與沒有此欄位的舊資料預設收合；已儲存的收合狀態在重新整理後保留。
 - `updateAppearanceSummary()` 集中產生摘要，方向、排版、主題或背景變動後都走同一處更新。
 - 此偏好不放入草稿匯出檔，匯入其他電腦時沿用當地介面狀態。
 

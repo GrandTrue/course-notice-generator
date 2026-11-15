@@ -166,7 +166,7 @@
     const sheet = sampleSheet();
     return {
       theme: "classic",
-      appearanceOpen: true,
+      appearanceOpen: false,
       activeSheetId: sheet.id,
       sheets: [sheet],
       history: { classrooms: [], courses: [], teachers: [] }
@@ -235,7 +235,7 @@
     const history = value.history && typeof value.history === "object" ? value.history : {};
     return {
       theme: THEMES.includes(value.theme) ? value.theme : "classic",
-      appearanceOpen: value.appearanceOpen !== false,
+      appearanceOpen: value.appearanceOpen === true,
       activeSheetId,
       sheets,
       history: {
@@ -372,9 +372,9 @@
   function updateAppearanceSummary() {
     const sheet = activeSheet();
     elements.appearanceSummary.textContent = [
-      ORIENTATION_LABELS[sheet.orientation],
-      TEMPLATE_LABELS[sheet.template],
+      `A4 ${ORIENTATION_LABELS[sheet.orientation]}`,
       THEME_LABELS[state.theme],
+      TEMPLATE_LABELS[sheet.template],
       sheet.backgroundEnabled ? "背景開啟" : "背景關閉"
     ].join("・");
   }

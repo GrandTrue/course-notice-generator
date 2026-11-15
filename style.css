@@ -161,8 +161,9 @@ button { cursor: pointer; }
 }
 
 .editor-body { min-height: 0; padding: 24px 30px 40px; overflow-y: auto; scrollbar-gutter: stable; }
-.sheets-section, .settings-section, .notices-section { max-width: 100%; }
-.settings-section, .notices-section { margin-top: 34px; }
+.sheets-section, .settings-section, .notices-section, .paper-settings { max-width: 100%; }
+.settings-section, .notices-section { margin-top: var(--space-5); }
+.paper-settings { margin-top: 34px; }
 
 .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 17px; }
 .section-heading > div:first-child { min-width: 0; }
@@ -182,10 +183,10 @@ button { cursor: pointer; }
 }
 .sheets-section > .section-heading h2::before { content: "01"; }
 .settings-section > .section-heading h2::before { content: "02"; }
-.notices-section > .section-heading h2::before { content: "06"; }
+.notices-section > .section-heading h2::before { content: "03"; }
 .section-heading p { margin: 3px 0 0; color: var(--ui-muted); font-size: 12px; }
 
-.field-grid, .notice-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 12px; }
+.notice-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 12px; }
 .course-field-row { display: grid; grid-template-columns: minmax(112px, .55fr) minmax(0, 1.45fr); gap: 12px; }
 .field-group { display: flex; min-width: 0; flex-direction: column; gap: 6px; }
 /* display:flex 會蓋掉 hidden 屬性，條件欄位要另外關掉。 */
@@ -247,19 +248,19 @@ input:focus, select:focus, textarea:focus { border-color: var(--focus); outline:
 .orientation-picker, .template-picker, .theme-picker { position: relative; margin: 29px 0 0; padding: 0; border: 0; }
 .orientation-picker legend, .template-picker legend, .theme-picker legend { display: flex; width: 100%; align-items: center; gap: 12px; margin-bottom: 14px; color: var(--ui-text); font-size: 16px; font-weight: 800; }
 .orientation-picker legend::before {
-  content: "03";
-  color: var(--accent);
-  font-size: 16px;
-  font-weight: 900;
-}
-.template-picker legend::before {
   content: "04";
   color: var(--accent);
   font-size: 16px;
   font-weight: 900;
 }
-.theme-picker legend::before {
+.template-picker legend::before {
   content: "05";
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 900;
+}
+.theme-picker legend::before {
+  content: "06";
   color: var(--accent);
   font-size: 16px;
   font-weight: 900;
@@ -1464,7 +1465,7 @@ body[data-theme="newsprint"] .sheet-background-art::after {
   .editor { border-left-width: 5px; }
   .editor-header { padding: 23px 18px 20px; }
   .editor-body { padding: 21px 15px 29px; }
-  .field-grid, .notice-form-grid, .course-field-row { grid-template-columns: 1fr; }
+  .notice-form-grid, .course-field-row { grid-template-columns: 1fr; }
   .field-group-wide { grid-column: auto; }
   .notice-editor-heading { align-items: flex-start; }
   .notice-editor-title { gap: 5px; }

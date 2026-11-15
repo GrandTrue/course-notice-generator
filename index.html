@@ -7,7 +7,7 @@
   <meta name="description" content="可直接在瀏覽器製作、列印與下載 A4 課程異動公告的免費工具。">
   <link rel="icon" href="data:,">
   <title>A4 課程異動公告工具</title>
-  <link rel="stylesheet" href="style.css?v=20261115-clean-headers">
+  <link rel="stylesheet" href="style.css?v=20261115-content-first">
 </head>
 <body>
   <div class="app-shell">
@@ -45,18 +45,33 @@
             <h2 id="basic-settings-title">公告設定</h2>
           </div>
 
-          <div class="field-grid">
-            <div class="field-group">
-              <label for="classroom">教室</label>
-              <input id="classroom" type="text" maxlength="18" autocomplete="off" list="history-classrooms" placeholder="例如 R212">
+          <div class="field-group">
+            <label for="classroom">教室</label>
+            <input id="classroom" type="text" maxlength="18" autocomplete="off" list="history-classrooms" placeholder="例如 R212">
+          </div>
+        </section>
+
+        <section class="notices-section" aria-labelledby="notices-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="notices-title">課程異動項目</h2>
+              <p id="notice-count" aria-live="polite"></p>
             </div>
-            <div class="field-group field-group-wide">
-              <label for="footer-text">頁尾文字</label>
-              <input id="footer-text" type="text" maxlength="80" autocomplete="off" placeholder="可留空">
-            </div>
+            <button id="add-notice" class="button button-secondary" type="button">
+              <span aria-hidden="true">＋</span> 新增一則
+            </button>
+          </div>
+          <div id="notice-editors" class="notice-editors"></div>
+          <p id="limit-message" class="limit-message" role="status" hidden>已達 6 則上限，建議拆成第二張公告。</p>
+        </section>
+
+        <section class="paper-settings" aria-label="頁尾與版面設定">
+          <div class="field-group">
+            <label for="footer-text">頁尾文字</label>
+            <input id="footer-text" type="text" maxlength="80" autocomplete="off" placeholder="可留空">
           </div>
 
-          <details id="appearance-details" class="appearance-details" open>
+          <details id="appearance-details" class="appearance-details">
             <summary>
               <span class="appearance-summary-copy">
                 <strong>紙張與風格</strong>
@@ -171,19 +186,6 @@
           </details>
         </section>
 
-        <section class="notices-section" aria-labelledby="notices-title">
-          <div class="section-heading">
-            <div>
-              <h2 id="notices-title">課程異動項目</h2>
-              <p id="notice-count" aria-live="polite"></p>
-            </div>
-            <button id="add-notice" class="button button-secondary" type="button">
-              <span aria-hidden="true">＋</span> 新增一則
-            </button>
-          </div>
-          <div id="notice-editors" class="notice-editors"></div>
-          <p id="limit-message" class="limit-message" role="status" hidden>已達 6 則上限，建議拆成第二張公告。</p>
-        </section>
       </main>
 
       <footer class="editor-actions">
@@ -333,6 +335,6 @@
     </section>
   </template>
 
-  <script src="script.js?v=20261115-clean-headers"></script>
+  <script src="script.js?v=20261115-content-first"></script>
 </body>
 </html>
