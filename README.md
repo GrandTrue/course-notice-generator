@@ -176,7 +176,7 @@ DOM 不是用字串拼出來的，是 clone `<template>` 再填值。要改結�
 1. `index.html` 的 `.theme-options` 內複製一組 `<label class="theme-option" data-theme-option="新名稱">`。
 2. `script.js` 的 `sanitizeState()` 把新名稱加進 `theme` 白名單陣列。
 3. `style.css` 主題層加一個 `body[data-theme="新名稱"] { ... }`，**只宣告變數**。
-4. `style.css` 加色票小方塊：`.theme-option[data-theme-option="新名稱"] .theme-swatch i:nth-child(1|2|3)`。
+4. `style.css` 加版型縮圖樣式：`[data-theme-option="新名稱"] .theme-thumbnail` 與內部元件。縮圖以一致的 A4 橫式範例呈現各款版面，和草稿選用的紙張方向無關。
 
 只有真的無法用變數表達的造型（額外裝飾線、編號欄、偽元素）才寫成該主題的「結構性補充」，並控制在數行內。
 
@@ -187,7 +187,7 @@ DOM 不是用字串拼出來的，是 clone `<template>` 再填值。要改結�
 | 編輯區 | `--editor-shadow` `--editor-header-pad-top` | 面板陰影、標題區上留白 |
 | | `--editor-badge` `--editor-badge-top/-color/-font/-size/-tracking` | 右上角英文角標。預設 `none` 即不顯示；設成字串才出現 |
 | | `--heading-rule` | 區塊標題右側那條延伸線（friendly 用虛線漸層） |
-| | `--field-radius` `--swatch-radius` `--choice-border` | 表單與選項卡外觀 |
+| | `--field-radius` `--choice-border` | 表單與選項卡外觀 |
 | | `--choice-checked-ring` `--template-checked-ring` `--choice-checked-shadow` `--choice-checked-transform` | 選中狀態的內框、外框與位移（geometric 用硬陰影取代內框） |
 | | `--editor-card-border/-rail/-rail-alt/-shadow` `--editor-num-color` | 左欄公告卡片 |
 | | `--delete-color` `--delete-hover-bg` `--button-*` `--save-status-color` | 按鈕與狀態文字 |
