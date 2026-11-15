@@ -159,7 +159,7 @@ DOM 不是用字串拼出來的，是 clone `<template>` 再填值。要改結�
 
 ## 6. 主題系統
 
-七個主題：`classic`（預設）、`friendly`、`geometric`、`contemporary`、`official`、`newsprint`、`frontier`（前線工業）。
+七個主題：`classic`（預設）、`friendly`、`geometric`、`contemporary`、`official`、`newsprint`、`frontier`（前線工業）。各款報頭都有淡色裝飾，跟隨草稿的背景開關；裝飾不占版面空間。
 
 前線工業參考[《明日方舟：終末地》官方資訊頁](https://endfield.gryphline.com/zh-tw#information)的黑黃色彩及工業標示。切角報頭保留黃線，並加上淡灰等高線、角落點陣與側邊壓條；這些裝飾和紙面等高線、教室浮水印一起跟隨草稿的背景開關。等高線以內嵌 SVG 繪製，離線預覽及 PNG 匯出不需外部圖片。
 
