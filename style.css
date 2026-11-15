@@ -1131,8 +1131,10 @@ body[data-theme="contemporary"] .notice-course { letter-spacing: -.02em; }
 body[data-theme="contemporary"] .sheet-background-art::before {
   right: -12%;
   bottom: -16%;
-  width: 72%;
-  height: 86%;
+  /* Both rings share a square so the outer circle is never clipped by an ellipse. */
+  width: min(72%, calc(var(--paper-height) * .86));
+  height: auto;
+  aspect-ratio: 1;
   border-radius: 50%;
   background: radial-gradient(circle, transparent 0 25%, #58e0d0 25.5% 39%, transparent 39.5% 52%, #de3bcf 52.5% 70%, transparent 70.5%);
   mask-image: none;
