@@ -1214,6 +1214,29 @@ body[data-theme="frontier"] .background-on .sheet-header {
   background-repeat: no-repeat;
 }
 body[data-theme="frontier"] .sheet-notice { padding-inline: 20px 10px; }
+/* Keep the date above the course, but let the course lead the reading order. */
+body[data-theme="frontier"] #notice-sheet .notice-date {
+  color: #424841;
+  font-size: calc(var(--notice-date-size) * var(--fit-scale) * .71);
+  font-weight: 720;
+}
+body[data-theme="frontier"] #notice-sheet:not(.count-1) .notice-details { margin-left: 0; }
+body[data-theme="frontier"] #notice-sheet .notice-details {
+  margin-top: calc(var(--notice-details-gap) * var(--fit-scale) * .6);
+}
+body[data-theme="frontier"] #notice-sheet .notice-course {
+  font-size: calc(var(--notice-course-size) * var(--fit-scale) * 1.05);
+}
+body[data-theme="frontier"] #notice-sheet .notice-level {
+  height: calc(var(--notice-course-size) * var(--fit-scale) * 1.05 * 1.16);
+}
+body[data-theme="frontier"] .notice-meta-label { color: #5f655c; font-weight: 650; }
+body[data-theme="frontier"] #notice-sheet .notice-note {
+  color: #424841;
+  margin-top: calc((var(--notice-note-gap) + 2px) * var(--fit-scale));
+  font-weight: 500;
+  line-height: 1.38;
+}
 body[data-theme="frontier"] .sheet-notice::before {
   content: "";
   position: absolute;
