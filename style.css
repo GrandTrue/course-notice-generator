@@ -859,6 +859,9 @@ body.notice-drag-active { cursor: grabbing; user-select: none; }
 .notice-sheet.orientation-portrait .sheet-title h2 { font-size: 32px; }
 .notice-sheet.orientation-portrait .sheet-title p { margin-top: 6px; font-size: 14px; }
 .notice-sheet.orientation-portrait .sheet-notice { padding-right: 8px; padding-left: 8px; }
+body:is([data-theme="geometric"], [data-theme="frontier"]) .notice-sheet.orientation-portrait .sheet-notice {
+  padding-left: 26px;
+}
 .notice-sheet.orientation-portrait .notice-topline { gap: 20px; }
 .notice-sheet.orientation-portrait .notice-details { margin-left: 6px; }
 .notice-sheet.orientation-portrait.template-large {
