@@ -509,6 +509,7 @@ body.notice-drag-active { cursor: grabbing; user-select: none; }
 .preview-toolbar { display: flex; align-items: center; justify-content: space-between; width: min(100%, 1180px); margin: 0 auto 13px; }
 .preview-toolbar h2 { margin: 0; font-size: 15px; }
 .preview-toolbar p { margin: 3px 0 0; color: var(--ui-muted); font-size: 11px; }
+.mobile-preview-toggle { display: none; }
 .save-status { display: inline-flex; align-items: center; gap: 6px; color: var(--save-status-color); font-size: 11px; font-weight: 700; }
 .save-status::before { content: "✓"; font-size: 15px; line-height: 1; }
 .save-status.saving { color: var(--ui-muted); }
@@ -1454,8 +1455,23 @@ body[data-theme="newsprint"] .sheet-background-art::after {
 }
 
 @media (max-width: 1050px) {
+  html { scroll-padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
   body { overflow: auto; }
-  .app-shell { display: block; height: auto; }
+  .app-shell { display: block; height: auto; padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
+  .mobile-preview-toggle {
+    position: fixed;
+    z-index: 5;
+    right: max(16px, env(safe-area-inset-right, 0px));
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    display: inline-flex;
+    min-height: 44px;
+    border: 1px solid var(--ui-border-strong);
+    background: var(--ui-surface);
+    color: var(--ui-text);
+    box-shadow: 0 3px 12px rgb(20 33 55 / 20%);
+  }
+  .mobile-preview-toggle:hover { background: var(--ui-choice-selected); }
+  .notice-drag-active .mobile-preview-toggle { visibility: hidden; }
   .editor { height: auto; min-height: 100vh; overflow: visible; border-right: 0; border-bottom: 1px solid var(--ui-border-strong); border-left-width: 8px; }
   .editor-body { overflow: visible; }
   .preview-workspace { height: min(78vw, 760px); min-height: 470px; padding-inline: 16px; }
@@ -1493,7 +1509,7 @@ body[data-theme="newsprint"] .sheet-background-art::after {
   body[data-orientation="portrait"] { page: notice-portrait; }
   html, body { width: var(--print-width); height: var(--print-height); margin: 0 !important; padding: 0 !important; overflow: hidden !important; background: #fff !important; }
   body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-  .editor, .preview-toolbar, .print-tip, .notice-drag-float { display: none !important; }
+  .editor, .preview-toolbar, .print-tip, .notice-drag-float, .mobile-preview-toggle { display: none !important; }
   .app-shell, .preview-workspace, .preview-stage { display: block; width: var(--print-width); height: var(--print-height); margin: 0; padding: 0; overflow: hidden; background: #fff; }
   .notice-sheet {
     position: static;

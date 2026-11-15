@@ -7,7 +7,7 @@
   <meta name="description" content="可直接在瀏覽器製作、列印與下載 A4 課程異動公告的免費工具。">
   <link rel="icon" href="data:,">
   <title>A4 課程異動公告工具</title>
-  <link rel="stylesheet" href="style.css?v=20261115-content-first">
+  <link rel="stylesheet" href="style.css?v=20261115-mobile-preview">
 </head>
 <body>
   <div class="app-shell">
@@ -16,7 +16,7 @@
         <div>
           <h1>課程異動公告工具</h1>
         </div>
-        <p>修改內容後，右側公告會立即更新。</p>
+        <p>修改內容後，公告預覽會立即更新。</p>
       </header>
 
       <main id="editor-body" class="editor-body">
@@ -210,10 +210,10 @@
       </footer>
     </aside>
 
-    <section class="preview-workspace" aria-labelledby="preview-title">
+    <section id="preview-workspace" class="preview-workspace" aria-labelledby="preview-title">
       <div class="preview-toolbar">
         <div>
-          <h2 id="preview-title">A4 即時預覽</h2>
+          <h2 id="preview-title" tabindex="-1">A4 即時預覽</h2>
           <p id="preview-paper-meta">297 × 210 mm・橫式</p>
         </div>
         <span id="save-status" class="save-status" role="status" aria-live="polite">已自動儲存</span>
@@ -237,6 +237,10 @@
       <p class="print-tip">列印時請關閉瀏覽器的頁首與頁尾，縮放選擇「預設」或 100%。</p>
     </section>
   </div>
+
+  <button id="mobile-preview-toggle" class="button button-primary mobile-preview-toggle" type="button" aria-controls="preview-workspace">
+    查看預覽
+  </button>
 
   <!-- 輸入記憶：內容由 script.js 依 state.history 填入 -->
   <datalist id="history-classrooms"></datalist>
@@ -335,6 +339,6 @@
     </section>
   </template>
 
-  <script src="script.js?v=20261115-content-first"></script>
+  <script src="script.js?v=20261115-mobile-preview"></script>
 </body>
 </html>

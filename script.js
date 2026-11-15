@@ -8,6 +8,7 @@
   const STORAGE_KEY = "course-notice-tool.v2";
   const LEGACY_KEY = "course-notice-tool.v1";   // v1 只存單張公告，開檔時自動搬移
   const MAX_NOTICES = 6;
+  const STACKED_LAYOUT = "(max-width: 1050px)";
   const DRAG_HOLD_MS = 140;
   const DRAG_START_DISTANCE = 7;
   const MAX_SHEETS = 8;
@@ -834,6 +835,7 @@
    * ======================================================================== */
 
   function connectStaticControls() {
+    connectMobilePreview();
     elements.classroom.addEventListener("input", (event) => {
       activeSheet().classroom = event.target.value;
       renderSheetTabs();
@@ -985,6 +987,50 @@
     });
   }
 
+  function connectMobilePreview() {
+    const toggle = document.querySelector("#mobile-preview-toggle");
+    const editor = document.querySelector(".editor");
+    const preview = document.querySelector("#preview-workspace");
+    const title = document.querySelector("#preview-title");
+    const stacked = window.matchMedia(STACKED_LAYOUT);
+    let lastEditorFocus = null;
+    let returnPoint = null;
+
+    editor.addEventListener("focusin", (event) => {
+      lastEditorFocus = event.target;
+    });
+
+    toggle.addEventListener("click", () => {
+      if (returnPoint) {
+        const { y, focus } = returnPoint;
+        returnPoint = null;
+        toggle.textContent = "查看預覽";
+        window.scrollTo({ top: y, behavior: "instant" });
+        requestAnimationFrame(() => {
+          if (!returnPoint && focus?.isConnected && focus.getClientRects().length) {
+            focus.focus({ preventScroll: true });
+          }
+        });
+        return;
+      }
+
+      const active = document.activeElement;
+      const candidate = editor.contains(active) ? active : lastEditorFocus;
+      const focused = candidate?.getBoundingClientRect();
+      const focus = focused && focused.bottom > 0 && focused.top < window.innerHeight ? candidate : null;
+      returnPoint = { y: window.scrollY, focus };
+      toggle.textContent = "返回編輯";
+      title.focus({ preventScroll: true });
+      preview.scrollIntoView({ block: "start", behavior: "instant" });
+    });
+
+    stacked.addEventListener("change", () => {
+      if (stacked.matches) return;
+      returnPoint = null;
+      toggle.textContent = "查看預覽";
+    });
+  }
+
   /* ==========================================================================
    * 渲染
    * ======================================================================== */
@@ -1024,7 +1070,7 @@
   }
 
   function autoScrollWhileDragging(clientY) {
-    const stacked = window.matchMedia("(max-width: 1050px)").matches;
+    const stacked = window.matchMedia(STACKED_LAYOUT).matches;
     const bounds = stacked
       ? { top: 0, bottom: window.innerHeight }
       : elements.editorBody.getBoundingClientRect();
