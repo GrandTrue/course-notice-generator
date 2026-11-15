@@ -7,7 +7,7 @@
   <meta name="description" content="可直接在瀏覽器製作、列印與下載 A4 課程異動公告的免費工具。">
   <link rel="icon" href="data:,">
   <title>A4 課程異動公告工具</title>
-  <link rel="stylesheet" href="style.css?v=20261115-contemporary-circle">
+  <link rel="stylesheet" href="style.css?v=20261115-output-fixes">
 </head>
 <body>
   <div class="app-shell">
@@ -187,6 +187,7 @@
       </main>
 
       <footer class="editor-actions">
+        <p id="overflow-warning" class="overflow-warning" role="status" hidden>目前內容超出 A4 範圍，無法完整輸出。請縮短內容、改用直式或拆成兩張公告。</p>
         <div id="undo-bar" class="undo-bar" role="status" hidden>
           <span id="undo-text"></span>
           <button id="undo-delete" class="button-link" type="button">復原</button>
@@ -229,6 +230,7 @@
           <div id="preview-notices" class="sheet-notices"></div>
           <footer id="preview-footer" class="sheet-footer"></footer>
         </article>
+        <p class="print-overflow-warning" aria-hidden="true">公告超出 A4 範圍。請回到編輯畫面，縮短內容、改用直式或拆成兩張公告後再列印。</p>
       </div>
       <p class="print-tip">列印時請關閉瀏覽器的頁首與頁尾，縮放選擇「預設」或 100%。</p>
     </section>
@@ -331,6 +333,6 @@
     </section>
   </template>
 
-  <script src="script.js?v=20261115-contemporary-circle"></script>
+  <script src="script.js?v=20261115-output-fixes"></script>
 </body>
 </html>

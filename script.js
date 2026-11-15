@@ -58,7 +58,7 @@
   const THEMES = ["classic", "friendly", "geometric", "contemporary", "official", "newsprint", "frontier"];
   const ORIENTATION_LABELS = { landscape: "橫式", portrait: "直式" };
   const TEMPLATE_LABELS = { standard: "標準排版", large: "醒目大字", compact: "多則緊湊" };
-  const THEME_LABELS = { classic: "經典編輯", friendly: "校園手札", geometric: "幾何學院", contemporary: "當代展演", official: "校務公文", newsprint: "黑白報刊" };
+  const THEME_LABELS = { classic: "經典編輯", friendly: "校園手札", geometric: "幾何學院", contemporary: "當代展演", official: "校務公文", newsprint: "黑白報刊", frontier: "前線工業" };
 
   const SAMPLE_SHEET = {
     classroom: "R212",
@@ -94,6 +94,7 @@
     exportImage: document.querySelector("#export-image"),
     exportImageLabel: document.querySelector("#export-image-label"),
     printNotice: document.querySelector("#print-notice"),
+    overflowWarning: document.querySelector("#overflow-warning"),
     editorBody: document.querySelector("#editor-body"),
     editors: document.querySelector("#notice-editors"),
     noticeCount: document.querySelector("#notice-count"),
@@ -180,10 +181,10 @@
     return {
       id: typeof value.id === "string" ? value.id : createId("notice"),
       date: String(value.date ?? "").slice(0, 50),
-      level: COURSE_LEVEL_LABELS[value.level] ? value.level : "",
+      level: typeof value.level === "string" && Object.hasOwn(COURSE_LEVEL_LABELS, value.level) ? value.level : "",
       course: String(value.course ?? "").slice(0, 80),
       teacher: String(value.teacher ?? "").slice(0, 40),
-      status: STATUS_LABELS[value.status] ? value.status : "general",
+      status: typeof value.status === "string" && Object.hasOwn(STATUS_LABELS, value.status) ? value.status : "general",
       target: String(value.target ?? "").slice(0, 30),
       note: String(value.note ?? "").slice(0, 100)
     };
@@ -280,16 +281,21 @@
     elements.saveStatus.textContent = "儲存中…";
     elements.saveStatus.classList.add("saving");
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        elements.saveStatus.textContent = "已自動儲存";
-        elements.saveStatus.classList.remove("saving");
-      } catch (error) {
-        console.warn("無法儲存資料。", error);
-        elements.saveStatus.textContent = "無法自動儲存";
-      }
-    }, 120);
+    saveTimer = setTimeout(flushPendingSave, 120);
+  }
+
+  function flushPendingSave() {
+    if (saveTimer === undefined) return;
+    clearTimeout(saveTimer);
+    saveTimer = undefined;
+    elements.saveStatus.classList.remove("saving");
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      elements.saveStatus.textContent = "已自動儲存";
+    } catch (error) {
+      console.warn("無法儲存資料。", error);
+      elements.saveStatus.textContent = "無法自動儲存";
+    }
   }
 
   /* ==========================================================================
@@ -610,16 +616,16 @@
     return promise;
   }
 
-  async function loadRuntimeFontsForCurrentTheme() {
-    const keys = ["sans"];
-    if (state.theme === "official" || state.theme === "newsprint") keys.push("serif");
-    await Promise.all(keys.map(loadRuntimeFont));
+  function fontKeysForTheme(theme) {
+    return theme === "official" || theme === "newsprint" ? ["sans", "serif"] : ["sans"];
   }
 
-  async function embeddedFontCss() {
-    const keys = ["sans"];
-    if (state.theme === "official" || state.theme === "newsprint") keys.push("serif");
-    const rules = await Promise.all(keys.map(async (key) => {
+  async function loadRuntimeFontsForCurrentTheme() {
+    await Promise.all(fontKeysForTheme(state.theme).map(loadRuntimeFont));
+  }
+
+  async function embeddedFontCss(theme) {
+    const rules = await Promise.all(fontKeysForTheme(theme).map(async (key) => {
       const asset = FONT_ASSETS[key];
       const dataUrl = await fontDataUrl(key);
       return `@font-face{font-family:"${asset.family}";src:url("${dataUrl}") format("woff2");font-style:normal;font-weight:${asset.weight};}`;
@@ -627,19 +633,9 @@
     return rules.join("\n");
   }
 
-  async function waitForCurrentFonts() {
+  async function waitForCurrentFonts(theme = state.theme) {
     if (!document.fonts) return;
-    await loadRuntimeFontsForCurrentTheme();
-    const loads = [
-      document.fonts.load('400 16px "Course Notice Sans"'),
-      document.fonts.load('900 16px "Course Notice Sans"')
-    ];
-    if (state.theme === "official" || state.theme === "newsprint") {
-      loads.push(document.fonts.load('400 16px "Course Notice Serif"'));
-      loads.push(document.fonts.load('900 16px "Course Notice Serif"'));
-    }
-    await Promise.all(loads);
-    await document.fonts.ready;
+    await Promise.all(fontKeysForTheme(theme).map(loadRuntimeFont));
   }
 
   function styleDeclarationText(styles) {
@@ -655,9 +651,9 @@
    * 視為不同來源），所以不能靠複製 CSS 檔。改把每個節點目前真正算出的樣式寫回
    * clone；偽元素另外產生限定到單一節點的規則。這讓離線與線上版本走同一條路徑。
    */
-  function createStyledExportClone() {
-    const clone = elements.sheet.cloneNode(true);
-    const sources = [elements.sheet, ...elements.sheet.querySelectorAll("*")];
+  function createStyledExportClone(sheet) {
+    const clone = sheet.cloneNode(true);
+    const sources = [sheet, ...sheet.querySelectorAll("*")];
     const targets = [clone, ...clone.querySelectorAll("*")];
     const pseudoRules = [];
 
@@ -677,6 +673,23 @@
     clone.removeAttribute("id");
     clone.setAttribute("aria-hidden", "true");
     return { clone, pseudoRules: pseudoRules.join("\n") };
+  }
+
+  function styleExportSnapshot(snapshot, theme) {
+    const currentTheme = document.body.dataset.theme;
+    // Measure with the original theme and loaded fonts; restore the live preview
+    // synchronously before yielding back to the browser.
+    document.body.dataset.theme = theme;
+    elements.sheet.replaceWith(snapshot);
+    try {
+      if (fitSheet(snapshot)) {
+        throw new Error("要匯出的公告超出 A4 範圍。請縮短內容、改用直式或拆成兩張，再下載。");
+      }
+      return createStyledExportClone(snapshot);
+    } finally {
+      snapshot.replaceWith(elements.sheet);
+      document.body.dataset.theme = currentTheme;
+    }
   }
 
   function loadImage(url) {
@@ -710,8 +723,9 @@
   }
 
   async function exportCurrentSheetAsImage() {
-    const sheet = activeSheet();
-    const portrait = sheet.orientation === "portrait";
+    const snapshot = elements.sheet.cloneNode(true);
+    const theme = state.theme;
+    const portrait = snapshot.classList.contains("orientation-portrait");
     const width = portrait ? 793.7 : 1122.52;
     const height = portrait ? 1122.52 : 793.7;
     elements.exportImage.disabled = true;
@@ -719,11 +733,10 @@
     elements.exportImageLabel.textContent = "產生中…";
 
     try {
-      await waitForCurrentFonts();
-      fitSheet();
-
-      const { clone, pseudoRules } = createStyledExportClone();
-      const fontCss = await embeddedFontCss();
+      await waitForCurrentFonts(theme);
+      const { clone, pseudoRules } = styleExportSnapshot(snapshot, theme);
+      const fontCss = await embeddedFontCss(theme);
+      const sheetXml = new XMLSerializer().serializeToString(clone);
       const exportOverrides = `
         .notice-sheet { position: static !important; top: auto !important; left: auto !important; width: ${width}px !important; height: ${height}px !important; margin: 0 !important; transform: none !important; box-shadow: none !important; }
         .is-placeholder { visibility: hidden !important; }
@@ -733,7 +746,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
           <foreignObject width="100%" height="100%">
             <div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;margin:0;overflow:hidden;background:#fff">
-              <style>${css}</style>${clone.outerHTML}
+              <style>${css}</style>${sheetXml}
             </div>
           </foreignObject>
         </svg>`;
@@ -907,7 +920,7 @@
       persistState();
       const newEditor = elements.editors.lastElementChild;
       newEditor?.querySelector("input")?.focus({ preventScroll: true });
-      elements.editorBody.scrollTo({ top: elements.editorBody.scrollHeight, behavior: "smooth" });
+      newEditor?.scrollIntoView({ block: "start" });
     });
 
     elements.resetAll.addEventListener("click", () => {
@@ -935,19 +948,26 @@
     elements.printNotice.addEventListener("click", async () => {
       try {
         await waitForCurrentFonts();
-        fitSheet();
       } catch (error) {
         console.error(error);
         showIoMessage("字體載入失敗，將以目前可用字體開啟列印。", true);
       }
+      if (fitSheet()) return;
       window.print();
     });
     document.addEventListener("pointermove", moveDraggedNotice, { passive: false });
     document.addEventListener("pointerup", finishNoticeDrag);
     document.addEventListener("pointercancel", finishNoticeDrag);
     window.addEventListener("resize", updatePreviewScale);
-    window.addEventListener("beforeprint", () => document.documentElement.style.setProperty("--preview-scale", "1"));
+    window.addEventListener("beforeprint", () => {
+      document.documentElement.style.setProperty("--preview-scale", "1");
+      fitSheet();
+    });
     window.addEventListener("afterprint", updatePreviewScale);
+    window.addEventListener("pagehide", flushPendingSave);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) flushPendingSave();
+    });
   }
 
   /* ==========================================================================
@@ -1230,39 +1250,44 @@
   }
 
   /* 教室名稱：縮到單行為止。到最小級數仍折行就接受兩行（極端長名）。 */
-  function fitHeader() {
-    const element = elements.previewClassroom;
+  function fitHeader(sheet) {
+    const element = sheet.querySelector(".sheet-classroom");
     for (const step of HEAD_STEPS) {
-      elements.sheet.style.setProperty("--head-scale", String(step));
+      sheet.style.setProperty("--head-scale", String(step));
       const styles = getComputedStyle(element);
       const lineHeight = parseFloat(styles.lineHeight) || parseFloat(styles.fontSize);
-      if (element.getBoundingClientRect().height <= lineHeight + FIT_TOLERANCE) break;
+      if (element.offsetHeight <= lineHeight + FIT_TOLERANCE) break;
     }
   }
 
-  function fitSheet() {
-    // 列印中或預覽被隱藏時不要重算（量到的值沒有意義）
-    if (!elements.previewNotices.isConnected || elements.previewNotices.clientHeight === 0) return;
+  function fitSheet(sheet = elements.sheet) {
+    const notices = sheet.querySelector(".sheet-notices");
+    if (!notices.isConnected || notices.clientHeight === 0) return sheet.dataset.overflow === "true";
 
-    fitHeader();   // 先定報頭，因為報頭高度會決定公告區剩多少空間
+    fitHeader(sheet);
+    const items = [...notices.querySelectorAll(".sheet-notice")];
+    items.forEach((item) => item.style.removeProperty("--fit-scale"));
 
     let applied = 1;
     for (const step of FIT_STEPS) {
       applied = step;
-      elements.sheet.style.setProperty("--fit-scale", String(step));
-      if (!overflowsVertically(elements.previewNotices)) break;
+      sheet.style.setProperty("--fit-scale", String(step));
+      if (!overflowsVertically(notices)) break;
     }
 
     // 第二關：極少數情況下單一則的內容仍超出自己的框（例如超長備註），
     // 針對那一則再多降一級，避免文字被 overflow:hidden 裁掉。
-    elements.previewNotices.querySelectorAll(".sheet-notice").forEach((item) => {
-      item.style.removeProperty("--fit-scale");
+    items.forEach((item) => {
       if (overflowsVertically(item)) {
         item.style.setProperty("--fit-scale", String(Math.max(applied * 0.88, 0.55)));
       }
     });
 
-    elements.sheet.dataset.fitScale = applied.toFixed(2);
+    const overflow = overflowsVertically(sheet) || overflowsVertically(notices) || items.some(overflowsVertically);
+    sheet.dataset.fitScale = applied.toFixed(2);
+    sheet.dataset.overflow = String(overflow);
+    if (sheet === elements.sheet) elements.overflowWarning.hidden = !overflow;
+    return overflow;
   }
 
   function updatePreviewScale() {
