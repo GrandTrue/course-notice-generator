@@ -7,7 +7,7 @@
   <meta name="description" content="可直接在瀏覽器製作、列印與下載 A4 課程異動公告的免費工具。">
   <link rel="icon" href="data:,">
   <title>A4 課程異動公告工具</title>
-  <link rel="stylesheet" href="style.css?v=20261115-theme-previews">
+  <link rel="stylesheet" href="style.css?v=20261115-paper-settings">
 </head>
 <body>
   <div class="app-shell">
@@ -51,34 +51,11 @@
           </div>
         </section>
 
-        <section class="notices-section" aria-labelledby="notices-title">
+        <section class="paper-settings" aria-labelledby="paper-settings-title">
           <div class="section-heading">
-            <div>
-              <h2 id="notices-title">課程異動項目</h2>
-              <p id="notice-count" aria-live="polite"></p>
-            </div>
-            <button id="add-notice" class="button button-secondary" type="button">
-              <span aria-hidden="true">＋</span> 新增一則
-            </button>
-          </div>
-          <div id="notice-editors" class="notice-editors"></div>
-          <p id="limit-message" class="limit-message" role="status" hidden>已達 6 則上限，建議拆成第二張公告。</p>
-        </section>
-
-        <section class="paper-settings" aria-label="頁尾與版面設定">
-          <div class="field-group">
-            <label for="footer-text">頁尾文字</label>
-            <input id="footer-text" type="text" maxlength="80" autocomplete="off" placeholder="可留空">
+            <h2 id="paper-settings-title">紙張與風格</h2>
           </div>
 
-          <details id="appearance-details" class="appearance-details">
-            <summary>
-              <span class="appearance-summary-copy">
-                <strong>紙張與風格</strong>
-                <small id="appearance-summary"></small>
-              </span>
-            </summary>
-            <div class="appearance-details-body">
           <fieldset class="orientation-picker">
             <legend>紙張方向</legend>
             <div class="orientation-options">
@@ -203,9 +180,26 @@
               <small>依公告數量自動調整濃淡</small>
             </span>
           </label>
-            </div>
-          </details>
         </section>
+
+        <section class="notices-section" aria-labelledby="notices-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="notices-title">課程異動項目</h2>
+              <p id="notice-count" aria-live="polite"></p>
+            </div>
+            <button id="add-notice" class="button button-secondary" type="button">
+              <span aria-hidden="true">＋</span> 新增一則
+            </button>
+          </div>
+          <div id="notice-editors" class="notice-editors"></div>
+          <p id="limit-message" class="limit-message" role="status" hidden>已達 6 則上限，建議拆成第二張公告。</p>
+        </section>
+
+        <div class="field-group footer-settings">
+          <label for="footer-text">頁尾文字</label>
+          <input id="footer-text" type="text" maxlength="80" autocomplete="off" placeholder="可留空">
+        </div>
 
       </main>
 
@@ -360,6 +354,6 @@
     </section>
   </template>
 
-  <script src="script.js?v=20261115-theme-previews"></script>
+  <script src="script.js?v=20261115-paper-settings"></script>
 </body>
 </html>

@@ -59,9 +59,6 @@
   const ORIENTATIONS = ["landscape", "portrait"];
   const TEMPLATES = ["standard", "large", "compact"];
   const THEMES = ["classic", "friendly", "geometric", "contemporary", "official", "newsprint", "frontier"];
-  const ORIENTATION_LABELS = { landscape: "橫式", portrait: "直式" };
-  const TEMPLATE_LABELS = { standard: "標準排版", large: "醒目大字", compact: "多則緊湊" };
-  const THEME_LABELS = { classic: "經典編輯", friendly: "校園手札", geometric: "幾何學院", contemporary: "當代展演", official: "校務公文", newsprint: "黑白報刊", frontier: "前線工業" };
 
   const SAMPLE_SHEET = {
     classroom: "R212",
@@ -85,8 +82,6 @@
     ioMessage: document.querySelector("#io-message"),
     classroom: document.querySelector("#classroom"),
     footer: document.querySelector("#footer-text"),
-    appearanceDetails: document.querySelector("#appearance-details"),
-    appearanceSummary: document.querySelector("#appearance-summary"),
     orientationInputs: [...document.querySelectorAll('input[name="orientation"]')],
     templateInputs: [...document.querySelectorAll('input[name="template"]')],
     layoutGuidance: document.querySelector("#layout-guidance"),
@@ -167,7 +162,6 @@
     const sheet = sampleSheet();
     return {
       theme: "classic",
-      appearanceOpen: false,
       activeSheetId: sheet.id,
       sheets: [sheet],
       history: { classrooms: [], courses: [], teachers: [] }
@@ -236,7 +230,6 @@
     const history = value.history && typeof value.history === "object" ? value.history : {};
     return {
       theme: THEMES.includes(value.theme) ? value.theme : "classic",
-      appearanceOpen: value.appearanceOpen === true,
       activeSheetId,
       sheets,
       history: {
@@ -368,16 +361,6 @@
           ? `目前 ${count} 則：建議標準排版；醒目大字已停用。`
           : `目前 ${count} 則：已使用多則緊湊排版。`
     );
-  }
-
-  function updateAppearanceSummary() {
-    const sheet = activeSheet();
-    elements.appearanceSummary.textContent = [
-      `A4 ${ORIENTATION_LABELS[sheet.orientation]}`,
-      THEME_LABELS[state.theme],
-      TEMPLATE_LABELS[sheet.template],
-      sheet.backgroundEnabled ? "背景開啟" : "背景關閉"
-    ].join("・");
   }
 
   /* ==========================================================================
@@ -877,7 +860,6 @@
           fitSheet();
           updatePreviewScale();
         });
-        updateAppearanceSummary();
         persistState();
         loadRuntimeFontsForCurrentTheme().then(() => {
           fitSheet();
@@ -887,12 +869,6 @@
           showIoMessage("字體載入失敗，目前暫用系統字體。", true);
         });
       });
-    });
-
-    elements.appearanceDetails.addEventListener("toggle", () => {
-      if (state.appearanceOpen === elements.appearanceDetails.open) return;
-      state.appearanceOpen = elements.appearanceDetails.open;
-      persistState();
     });
 
     elements.backgroundArtToggle.addEventListener("change", (event) => {
@@ -938,7 +914,6 @@
       hideUndo();
       state = {
         theme: state.theme,
-        appearanceOpen: state.appearanceOpen,
         activeSheetId: sheet.id,
         sheets: [sheet],
         history: state.history   // 輸入記憶不算內容，保留
@@ -1273,7 +1248,6 @@
   function renderPreview() {
     const sheet = activeSheet();
     const count = sheet.notices.length;
-    updateAppearanceSummary();
     elements.previewClassroom.textContent = sheet.classroom.trim() || "教室";
     elements.previewFooter.textContent = sheet.footer.trim();
     const isPortrait = sheet.orientation === "portrait";
@@ -1418,7 +1392,6 @@
     const layoutMessage = normalizeTemplateForCount();
     elements.classroom.value = sheet.classroom;
     elements.footer.value = sheet.footer;
-    elements.appearanceDetails.open = state.appearanceOpen;
     elements.orientationInputs.forEach((input) => { input.checked = input.value === sheet.orientation; });
     elements.backgroundArtToggle.checked = sheet.backgroundEnabled;
     updateTemplateAvailability(layoutMessage);
