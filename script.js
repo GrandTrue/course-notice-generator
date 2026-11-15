@@ -8,6 +8,8 @@
   const STORAGE_KEY = "course-notice-tool.v2";
   const LEGACY_KEY = "course-notice-tool.v1";   // v1 只存單張公告，開檔時自動搬移
   const MAX_NOTICES = 6;
+  const DRAG_HOLD_MS = 140;
+  const DRAG_START_DISTANCE = 7;
   const MAX_SHEETS = 8;
   const HISTORY_LIMIT = 20;
   const UNDO_TIMEOUT = 8000;
@@ -123,7 +125,7 @@
   let undoState = null;      // { notice, index, label }
   let undoTimer;
   let ioTimer;
-  let dragState = null;      // { article, handle, pointerId, sheetId, noticeId, moved }
+  let dragState = null;
   const fontDataPromises = new Map();
   const runtimeFontPromises = new Map();
 
@@ -957,7 +959,20 @@
     });
     document.addEventListener("pointermove", moveDraggedNotice, { passive: false });
     document.addEventListener("pointerup", finishNoticeDrag);
-    document.addEventListener("pointercancel", finishNoticeDrag);
+    for (const type of ["pointercancel", "lostpointercapture"]) {
+      elements.editors.addEventListener(type, (event) => {
+        if (dragState?.pointerId === event.pointerId) cancelNoticeDrag();
+      });
+    }
+    elements.editors.addEventListener("contextmenu", (event) => {
+      if (dragState) event.preventDefault();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !dragState) return;
+      event.preventDefault();
+      cancelNoticeDrag();
+    });
+    window.addEventListener("blur", cancelNoticeDrag);
     window.addEventListener("resize", updatePreviewScale);
     window.addEventListener("beforeprint", () => {
       document.documentElement.style.setProperty("--preview-scale", "1");
@@ -1022,11 +1037,41 @@
     else elements.editorBody.scrollTop += delta;
   }
 
+  function liftNotice(drag) {
+    clearTimeout(drag.holdTimer);
+    const card = drag.article.cloneNode(true);
+    const bounds = drag.article.getBoundingClientRect();
+    card.classList.add("notice-drag-float");
+    card.setAttribute("aria-hidden", "true");
+    card.inert = true;
+    card.querySelectorAll("[id], [list], label[for]").forEach((node) => {
+      for (const attribute of ["id", "list", "for"]) node.removeAttribute(attribute);
+    });
+    const controls = drag.article.querySelectorAll("[data-field]");
+    card.querySelectorAll("[data-field]").forEach((node, index) => { node.value = controls[index].value; });
+    const position = [...elements.editors.children].indexOf(drag.article) + 1;
+    card.querySelector("h3").dataset.dragNumber = String(position).padStart(2, "0");
+    card.style.top = `${bounds.top}px`;
+    card.style.left = `${bounds.left}px`;
+    card.style.width = `${bounds.width}px`;
+    document.body.append(card);
+    drag.float = card;
+    drag.article.classList.add("is-drag-placeholder");
+    document.body.classList.add("notice-drag-active");
+  }
+
   function moveDraggedNotice(event) {
-    if (!dragState || event.pointerId !== dragState.pointerId) return;
+    const drag = dragState;
+    if (!drag || event.pointerId !== drag.pointerId) return;
     event.preventDefault();
+    const offset = event.clientY - drag.startY;
+    if (!drag.float) {
+      if (Math.abs(offset) < DRAG_START_DISTANCE) return;
+      liftNotice(drag);
+    }
+    drag.float.style.setProperty("--drag-offset", `${offset}px`);
     autoScrollWhileDragging(event.clientY);
-    const { article } = dragState;
+    const { article } = drag;
     const otherCards = [...elements.editors.children].filter((item) => item !== article);
     const nextCard = otherCards.find((item) => {
       const bounds = item.getBoundingClientRect();
@@ -1039,18 +1084,31 @@
       if (article === elements.editors.lastElementChild) return;
       elements.editors.append(article);
     }
-    dragState.moved = true;
+    drag.moved = true;
     updateEditorPositionLabels();
+  }
+
+  function clearNoticeDrag() {
+    const drag = dragState;
+    if (!drag) return;
+    dragState = null;
+    clearTimeout(drag.holdTimer);
+    if (elements.editors.hasPointerCapture(drag.pointerId)) elements.editors.releasePointerCapture(drag.pointerId);
+    drag.float?.remove();
+    drag.article.classList.remove("is-drag-placeholder");
+    document.body.classList.remove("notice-drag-active");
+  }
+
+  function cancelNoticeDrag() {
+    const moved = dragState?.moved;
+    clearNoticeDrag();
+    if (moved) renderEditors();
   }
 
   function finishNoticeDrag(event) {
     if (!dragState || event.pointerId !== dragState.pointerId) return;
-    const { article, handle, sheetId, noticeId, moved } = dragState;
-    if (handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
-    article.classList.remove("is-dragging");
-    elements.editors.classList.remove("is-reordering");
-    document.body.classList.remove("notice-drag-active");
-    dragState = null;
+    const { sheetId, noticeId, moved } = dragState;
+    clearNoticeDrag();
     if (!moved || activeSheet().id !== sheetId) return;
 
     const noticesById = new Map(activeSheet().notices.map((notice) => [notice.id, notice]));
@@ -1065,24 +1123,26 @@
   }
 
   function beginNoticeDrag(event, article, noticeId) {
-    if ((event.pointerType === "mouse" && event.button !== 0) || activeSheet().notices.length <= 1) return;
+    if (dragState || event.button !== 0 || activeSheet().notices.length <= 1) return;
     event.preventDefault();
-    const handle = event.currentTarget;
-    dragState = {
+    // Capture on the list so that moving the original card does not interrupt the drag.
+    elements.editors.setPointerCapture(event.pointerId);
+    const drag = {
       article,
-      handle,
       pointerId: event.pointerId,
       sheetId: activeSheet().id,
       noticeId,
+      startY: event.clientY,
       moved: false
     };
-    handle.setPointerCapture(event.pointerId);
-    article.classList.add("is-dragging");
-    elements.editors.classList.add("is-reordering");
-    document.body.classList.add("notice-drag-active");
+    dragState = drag;
+    drag.holdTimer = setTimeout(() => {
+      if (dragState === drag) liftNotice(drag);
+    }, DRAG_HOLD_MS);
   }
 
   function renderEditors() {
+    clearNoticeDrag();
     const sheet = activeSheet();
     elements.editors.replaceChildren();
     sheet.notices.forEach((notice, index) => {
@@ -1096,6 +1156,7 @@
       dragHandle.setAttribute("aria-label", `拖曳第 ${index + 1} 則公告調整順序；按向上或向下方向鍵也可移動`);
       dragHandle.addEventListener("pointerdown", (event) => beginNoticeDrag(event, article, notice.id));
       dragHandle.addEventListener("keydown", (event) => {
+        if (dragState) return;
         if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
         event.preventDefault();
         reorderNoticeWithKeyboard(notice.id, event.key === "ArrowUp" ? -1 : 1);
