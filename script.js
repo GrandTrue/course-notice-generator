@@ -856,10 +856,7 @@
         if (!input.checked) return;
         state.theme = input.value;   // 主題是整個工具的偏好，不隨草稿切換
         document.body.dataset.theme = state.theme;
-        requestAnimationFrame(() => {
-          fitSheet();
-          updatePreviewScale();
-        });
+        renderPreview();
         persistState();
         loadRuntimeFontsForCurrentTheme().then(() => {
           fitSheet();
@@ -1282,6 +1279,12 @@
       levelElement.textContent = levelLabel;
       levelElement.hidden = !levelLabel;
       if (levelLabel) levelElement.classList.add(`level-${notice.level}`);
+      if (state.theme === "frontier" && levelLabel) {
+        const dateGroup = document.createElement("div");
+        dateGroup.className = "notice-date-group";
+        dateElement.replaceWith(dateGroup);
+        dateGroup.append(dateElement, levelElement);
+      }
       courseElement.textContent = course;
       teacherText.textContent = teacher ? `${teacher} 老師` : "授課教師待定";
       noteText.textContent = note;

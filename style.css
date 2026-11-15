@@ -1220,6 +1220,14 @@ body[data-theme="frontier"] #notice-sheet .notice-date {
   font-size: calc(var(--notice-date-size) * var(--fit-scale) * .71);
   font-weight: 720;
 }
+body[data-theme="frontier"] .notice-date-group {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 3px;
+}
 body[data-theme="frontier"] #notice-sheet:not(.count-1) .notice-details { margin-left: 0; }
 body[data-theme="frontier"] #notice-sheet .notice-details {
   margin-top: calc(var(--notice-details-gap) * var(--fit-scale) * .6);
@@ -1227,8 +1235,15 @@ body[data-theme="frontier"] #notice-sheet .notice-details {
 body[data-theme="frontier"] #notice-sheet .notice-course {
   font-size: calc(var(--notice-course-size) * var(--fit-scale) * 1.05);
 }
-body[data-theme="frontier"] #notice-sheet .notice-level {
-  height: calc(var(--notice-course-size) * var(--fit-scale) * 1.05 * 1.16);
+body[data-theme="frontier"] #notice-sheet .notice-date-group .notice-level {
+  height: auto;
+  padding: .22em .45em;
+  border: 0;
+  font-size: max(10px, calc(var(--notice-date-size) * var(--fit-scale) * .41));
+}
+body[data-theme="frontier"] #notice-sheet .notice-status {
+  min-width: calc(var(--notice-status-min) * var(--fit-scale) * .85);
+  font-size: calc(var(--notice-status-size) * var(--fit-scale) * .85);
 }
 body[data-theme="frontier"] .notice-meta-label { color: #5f655c; font-weight: 650; }
 body[data-theme="frontier"] #notice-sheet .notice-note {
