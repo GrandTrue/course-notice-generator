@@ -161,7 +161,7 @@ DOM 不是用字串拼出來的，是 clone `<template>` 再填值。要改結�
 
 七個主題：`classic`（預設）、`friendly`、`geometric`、`contemporary`、`official`、`newsprint`、`frontier`（前線工業）。
 
-前線工業參考[《明日方舟：終末地》官方資訊頁](https://endfield.gryphline.com/zh-tw#information)的黑黃色彩及工業標示。切角報頭與警示線由 CSS 繪製，底部斜紋、細網格及浮水印跟隨草稿的背景開關。
+前線工業參考[《明日方舟：終末地》官方資訊頁](https://endfield.gryphline.com/zh-tw#information)的黑黃色彩及工業標示。切角報頭與警示線由 CSS 繪製，黑白漸淡的地形等高線與教室浮水印跟隨草稿的背景開關。等高線以內嵌 SVG 繪製，離線預覽及 PNG 匯出不需外部圖片。
 
 ### 兩層 token
 

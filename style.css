@@ -1204,19 +1204,40 @@ body[data-theme="frontier"] .sheet-notice::before {
 }
 body[data-theme="frontier"] .status-general { color: var(--signal-carbon); background: var(--signal-yellow); }
 body[data-theme="frontier"] .status-cancelled { color: #fff; background: #9f2024; border-color: #9f2024; }
+/* Self-contained SVG: the same artwork also renders inside offline PNG exports. */
+body[data-theme="frontier"] .sheet-background-art { opacity: 1; }
 body[data-theme="frontier"] .sheet-background-art::before {
-  inset: 4% 0 0;
+  inset: 10% 0 0;
   width: auto;
   height: auto;
-  background-image:
-    linear-gradient(to right, var(--signal-carbon) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--signal-carbon) 1px, transparent 1px),
-    repeating-linear-gradient(135deg, var(--signal-carbon) 0 7px, transparent 7px 14px);
-  background-size: 26px 26px, 26px 26px, 100% 18px;
-  background-position: 0 0, 0 0, right bottom;
-  background-repeat: repeat, repeat, no-repeat;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 560' preserveAspectRatio='xMaxYMax slice'%3E\
+%3Cdefs%3E%3ClinearGradient id='ink' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='white' stop-opacity='0'/%3E%3Cstop offset='.28' stop-color='white'/%3E%3Cstop offset='.77' stop-color='black' stop-opacity='.8'/%3E%3Cstop offset='1' stop-color='black'/%3E%3C/linearGradient%3E%3C/defs%3E\
+%3Cg fill='none' stroke='url(%23ink)' stroke-width='1.45'%3E\
+%3Cpath d='M-70 426C36 404 69 314 134 271S277 250 349 199 406 98 493 53 715 40 862-40'/%3E\
+%3Cpath d='M-60 452C42 428 87 342 148 294S291 276 367 220 427 126 508 77 728 62 857-13'/%3E\
+%3Cpath d='M-45 476C56 460 103 365 165 316S322 298 389 238 447 145 529 100 738 86 855 13'/%3E\
+%3Cpath d='M-30 501C79 476 126 389 188 340S334 329 412 258 469 165 550 122 753 110 858 42'/%3E\
+%3Cpath d='M-13 533C95 492 153 411 218 369S358 346 434 281 495 183 569 148 767 139 868 71'/%3E\
+%3Cpath d='M29 559C129 513 172 444 243 397S385 365 457 305 517 206 594 173 781 162 873 102'/%3E\
+%3Cpath d='M74 581C174 537 202 468 273 425S418 384 478 328 544 229 620 197 794 187 883 130'/%3E\
+%3Cpath d='M126 594C211 551 240 492 305 449S444 406 502 351 567 251 644 223 809 210 879 163'/%3E\
+%3Cpath d='M182 614C261 570 282 514 337 476S472 429 529 376 599 276 674 252 810 237 887 192'/%3E\
+%3Cpath d='M239 632C326 584 331 530 387 496S506 452 558 402 624 304 700 280 827 266 893 219'/%3E\
+%3Cpath d='M303 650C373 609 391 544 442 514S539 479 585 429 651 333 726 309 846 296 899 248'/%3E\
+%3Cpath d='M360 663C426 621 449 565 491 531S573 503 614 456 678 360 750 336 862 329 902 282'/%3E\
+%3Cpath d='M404 673C473 629 490 577 529 550S607 523 646 484 703 388 776 364 879 357 909 312'/%3E\
+%3Cpath d='M571 591C576 566 599 557 629 543S682 501 706 464 775 401 810 410 840 455 812 487 758 521 717 542 640 607 596 607 568 597 571 591Z'/%3E\
+%3Cpath d='M620 584C623 568 651 561 677 539S711 489 739 464 794 430 805 443 783 481 756 498 713 525 682 550 615 603 620 584Z'/%3E\
+%3Cpath d='M713 515C716 502 746 467 768 462S772 477 757 489 711 523 713 515Z'/%3E\
+%3C/g%3E%3C/svg%3E") right bottom / cover no-repeat;
+  mask-image: linear-gradient(145deg, transparent 12%, transparent 28%, rgb(0 0 0 / 9%) 62%, rgb(0 0 0 / 21%) 100%);
 }
-body[data-theme="frontier"] .sheet-background-art::after { transform: none; }
+body[data-theme="frontier"] .count-5 .sheet-background-art::before,
+body[data-theme="frontier"] .count-6 .sheet-background-art::before { opacity: .65; }
+body[data-theme="frontier"] .sheet-background-art::after {
+  opacity: var(--background-art-opacity);
+  transform: none;
+}
 
 /* Official registry — restrained school administration colors and double rules. */
 body[data-theme="official"] {
