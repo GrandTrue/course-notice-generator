@@ -95,9 +95,6 @@ body {
   --sheet-accent-height: 3px;
   --sheet-accent-bottom: -3px;
   --sheet-accent-bg: var(--paper-accent);
-  --sheet-header-art:
-    linear-gradient(rgb(36 87 214 / 22%), rgb(36 87 214 / 22%)) center 48% / min(21%, 140px) 1px no-repeat,
-    repeating-linear-gradient(90deg, rgb(36 87 214 / 25%) 0 1px, transparent 1px 9px) center calc(48% + 4px) / 55px 5px no-repeat;
   --display-font: inherit;
   --classroom-font: var(--display-font);
   --title-font: var(--display-font);
@@ -591,7 +588,6 @@ body.notice-drag-active { cursor: grabbing; user-select: none; }
 .sheet-header, .sheet-notices, .sheet-footer { position: relative; z-index: 1; }
 
 .sheet-header { position: relative; display: flex; align-items: flex-end; justify-content: space-between; gap: 34px; padding-bottom: 22px; border-bottom: var(--sheet-header-rule); }
-.background-on .sheet-header { background: var(--sheet-header-art); }
 .sheet-header::after { content: ""; display: var(--sheet-accent-display); position: absolute; bottom: var(--sheet-accent-bottom); left: 0; width: var(--sheet-accent-width); height: var(--sheet-accent-height); background: var(--sheet-accent-bg); }
 .sheet-classroom { min-width: 0; color: var(--classroom-color); font-family: var(--classroom-font); --classroom-size: 104px; font-weight: 900; line-height: .82; letter-spacing: var(--classroom-tracking); overflow-wrap: anywhere; }
 .sheet-title { flex: 0 0 auto; text-align: right; }
@@ -979,9 +975,6 @@ body[data-theme="friendly"] {
   --sheet-shadow: 0 16px 38px rgb(83 66 39 / 18%), 0 1px 2px rgb(83 66 39 / 14%);
   --sheet-header-rule: 3px solid #3f675a;
   --sheet-accent-width: 96px;
-  --sheet-header-art:
-    radial-gradient(circle, rgb(216 114 87 / 12%) 0 12px, transparent 13px) calc(50% - 34px) 48% / 27px 27px no-repeat,
-    repeating-linear-gradient(to bottom, rgb(63 103 90 / 21%) 0 1px, transparent 1px 7px) calc(50% + 14px) 48% / 72px 15px no-repeat;
   --classroom-color: #3f675a;
   --sheet-title-color: #a9533f;
   --notice-rule: 1px dashed var(--paper-rule);
@@ -1060,10 +1053,6 @@ body[data-theme="geometric"] {
   --sheet-accent-bottom: -5px;
   --sheet-accent-width: 220px;
   --sheet-accent-height: 5px;
-  --sheet-header-art:
-    linear-gradient(132deg, transparent 29%, rgb(49 86 217 / 17%) 29% 45%, transparent 45% 51%,
-    rgb(255 91 61 / 20%) 51% 65%, transparent 65% 71%, rgb(49 86 217 / 17%) 71% 77%,
-    transparent 77%) center 48% / min(24%, 164px) 26px no-repeat;
   --sheet-title-color: #3156d9;
   --notice-rule: 2px solid var(--paper-rule);
   --status-radius: 0;
@@ -1147,9 +1136,6 @@ body[data-theme="contemporary"] {
   --sheet-header-rule: 3px solid #151018;
   --sheet-accent-width: 176px;
   --sheet-accent-bg: linear-gradient(90deg, #de3bcf 0 65%, #58e0d0 65%);
-  --sheet-header-art:
-    radial-gradient(circle, transparent 12px, rgb(184 23 170 / 24%) 12.5px 14px, transparent 14.5px) calc(50% - 10px) 48% / 30px 30px no-repeat,
-    radial-gradient(circle, transparent 12px, rgb(20 117 109 / 24%) 12.5px 14px, transparent 14.5px) calc(50% + 10px) 48% / 30px 30px no-repeat;
   --sheet-title-color: #b817aa;
   --status-radius: 12px 2px 12px 2px;
   --level-bachelor-bg: #ad2ea2;
@@ -1334,10 +1320,6 @@ body[data-theme="official"] {
   --sheet-accent-width: 112px;
   --sheet-accent-height: 7px;
   --sheet-accent-bg: #982b35;
-  --sheet-header-art:
-    linear-gradient(45deg, transparent 23%, rgb(152 43 53 / 26%) 24% 76%, transparent 77%) center 48% / 8px 8px no-repeat,
-    linear-gradient(135deg, transparent 23%, rgb(152 43 53 / 26%) 24% 76%, transparent 77%) center 48% / 8px 8px no-repeat,
-    linear-gradient(90deg, rgb(23 50 77 / 20%) 0 42%, transparent 42% 58%, rgb(23 50 77 / 20%) 58%) center 48% / min(19%, 128px) 1px no-repeat;
   --display-font: "Course Notice Serif", "Noto Serif TC", "PMingLiU", "Microsoft JhengHei", serif;
   --classroom-font: "Course Notice Serif", Georgia, "Noto Serif TC", "PMingLiU", serif;
   --title-tracking: .12em;
@@ -1410,10 +1392,6 @@ body[data-theme="newsprint"] {
   --sheet-shadow: 8px 8px 0 rgb(0 0 0 / 18%);
   --sheet-header-rule: 7px double #111;
   --sheet-accent-display: none;
-  --sheet-header-art:
-    repeating-linear-gradient(90deg, rgb(17 17 17 / 24%) 0 2px, transparent 2px 6px) center calc(48% - 4px) / 58px 2px no-repeat,
-    repeating-linear-gradient(90deg, rgb(17 17 17 / 24%) 0 2px, transparent 2px 6px) center 48% / 58px 2px no-repeat,
-    repeating-linear-gradient(90deg, rgb(17 17 17 / 24%) 0 2px, transparent 2px 6px) center calc(48% + 4px) / 58px 2px no-repeat;
   --display-font: "Course Notice Serif", Georgia, "Noto Serif TC", "PMingLiU", serif;
   --classroom-tracking: -.035em;
   --title-tracking: .04em;
